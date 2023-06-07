@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/livres")
@@ -19,8 +20,11 @@ public class LivreCrudController {
 
     @GetMapping
     public List<Livre> getAllLivres() {
-        return livreRepository.findAll();
+        List<Livre> allLivres = livreRepository.findAll();
+        List<Livre> nonDeletedLivres = allLivres.stream().filter(livre -> !livre.getSupprime()).collect(Collectors.toList());
+        return nonDeletedLivres;
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Livre> getLivreById(@PathVariable Long id) {
@@ -50,8 +54,10 @@ public class LivreCrudController {
     public ResponseEntity<?> deleteLivre(@PathVariable Long id) {
         return livreRepository.findById(id)
                 .map(livre -> {
-                    livreRepository.delete(livre);
+                    livre.setSupprime(true);
+                    livreRepository.save(livre);
                     return ResponseEntity.ok().build();
                 }).orElse(ResponseEntity.notFound().build());
     }
+
 }

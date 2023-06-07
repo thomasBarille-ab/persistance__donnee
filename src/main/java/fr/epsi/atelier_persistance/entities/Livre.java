@@ -28,4 +28,7 @@ public class Livre {
 
     @OneToMany(mappedBy = "livre", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Emprunt> emprunts;
+
+    @Column(nullable = false)
+    private Boolean supprime = false;
 }
